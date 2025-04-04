@@ -4,10 +4,5 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "buildCommand": "npm run build",
-  "outputDirectory": "build",
-  "env": {
-    "REACT_APP_API_URL": "@react_app_api_url",
-    "REACT_APP_STRIPE_PUBLISHABLE_KEY": "@react_app_stripe_publishable_key",
-    "REACT_APP_DASHBOARD_URL": "@react_app_dashboard_url"
-  }
+  "outputDirectory": "build"
 } 
