@@ -16,9 +16,9 @@ This guide outlines the steps to deploy the GoAgent application to production us
 
 Add these environment variables in the Vercel dashboard:
 
-- `REACT_APP_API_URL`: Your production backend URL (e.g., `https://goagent-backend.onrender.com`)
+- `REACT_APP_API_URL`: Your production backend URL (e.g., ``)
 - `REACT_APP_STRIPE_PUBLISHABLE_KEY`: Your Stripe publishable key
-- `REACT_APP_DASHBOARD_URL`: Your dashboard URL (e.g., `https://solutions.tixaeagents.ai`)
+- `REACT_APP_DASHBOARD_URL`: Your dashboard URL (e.g., ``)
 
 ### Backend (Render)
 
@@ -26,7 +26,7 @@ Add these environment variables in the Render dashboard:
 
 - `NODE_ENV`: `production`
 - `PORT`: `10000` (or your preferred port)
-- `FRONTEND_URL`: Your production frontend URL (e.g., `https://goagent.vercel.app`)
+- `FRONTEND_URL`: Your production frontend URL (e.g., ``)
 - `API_KEY`: Your Tixiea API key
 - `STRIPE_SECRET_KEY`: Your Stripe secret key
 - `STRIPE_PUBLISHABLE_KEY`: Your Stripe publishable key

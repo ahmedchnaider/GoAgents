@@ -1,15 +1,9 @@
-import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import React, { useState, FormEvent, ChangeEvent } from 'react';
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements
-} from '@stripe/react-stripe-js';
+// Remove Stripe imports
 // Import API configuration
-import { endpoint, STRIPE_PUBLISHABLE_KEY } from '../api/config';
+import { endpoint } from '../api/config';
 
 // Styled Components
 const Container = styled.div`
@@ -256,15 +250,16 @@ const PlanPrice = styled.span`
   font-weight: 500;
 `;
 
-const PaymentSectionWrapper = styled.div<{ visible: boolean }>`
-  margin-top: 20px;
-  display: ${props => props.visible ? 'block' : 'none'};
-`;
-
-const PaymentSectionTitle = styled.h3`
-  font-size: 16px;
-  margin-bottom: 16px;
-  font-weight: 600;
+const RecommendedBadge = styled.div`
+  background-color: #4754F0;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  position: absolute;
+  top: -10px;
+  right: -10px;
 `;
 
 const TrustedSection = styled.div`
@@ -314,259 +309,11 @@ const ErrorMessage = styled.div`
   margin-top: 10px;
 `;
 
-// Add these new styled components
-const PaymentContainer = styled.div`
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-`;
-
-const PaymentForm = styled.form`
-  width: 100%;
-`;
-
-const PayButton = styled.button<{ disabled?: boolean }>`
-  width: 100%;
-  padding: 12px;
-  background: ${props => props.disabled ? '#a0a0a0' : '#4754F0'};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  font-weight: 500;
-  margin-top: 20px;
-  
-  &:hover {
-    background: ${props => props.disabled ? '#a0a0a0' : '#3a45d1'};
-  }
-`;
-
-const SuccessMessage = styled.div`
-  color: #28a745;
-  margin-top: 10px;
-  font-size: 14px;
-`;
-
-// Add a new Modal component
-const Modal = styled.div<{ isOpen: boolean }>`
-  display: ${props => props.isOpen ? 'flex' : 'none'};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  width: 450px;
-  max-width: 90%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-`;
-
-const ModalTitle = styled.h2`
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #999;
-  
-  &:hover {
-    color: #333;
-  }
-`;
-
-// Update the checkout form component to use Link Payment Element
-const CheckoutForm = ({ 
-  amount, 
-  plan, 
-  onPaymentSuccess,
-  onPaymentError 
-}: { 
-  amount: number, 
-  plan: string,
-  onPaymentSuccess?: () => void,
-  onPaymentError?: (message: string) => void
-}) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>();
-  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage(undefined);
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/payment-success`,
-      },
-      redirect: 'if_required',
-    });
-
-    if (error) {
-      setErrorMessage(error.message);
-      if (onPaymentError) onPaymentError(error.message || 'Payment failed');
-    } else {
-      setPaymentSuccessful(true);
-      if (onPaymentSuccess) onPaymentSuccess();
-    }
-
-    setIsLoading(false);
-  };
-
-  return (
-    <PaymentForm onSubmit={handleSubmit}>
-      <PaymentElement />
-      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-      {paymentSuccessful && <SuccessMessage>Payment successful!</SuccessMessage>}
-      <PayButton disabled={!stripe || isLoading}>
-        {isLoading ? 'Processing...' : `Pay $${(amount / 100).toFixed(2)}`}
-      </PayButton>
-    </PaymentForm>
-  );
-};
-
-// Update the Stripe wrapper component
-const InlineStripePayment = ({ 
-  amount, 
-  plan, 
-  onPaymentSuccess,
-  onPaymentError
-}: { 
-  amount: number, 
-  plan: string, 
-  onPaymentSuccess?: () => void,
-  onPaymentError?: (message: string) => void
-}) => {
-  const [clientSecret, setClientSecret] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [paymentIntentId, setPaymentIntentId] = useState<string>('');
-
-  // Load Stripe outside of component render to avoid recreating Stripe object on every render
-  // Use environment variable for Stripe publishable key
-  const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY || '');
-
-  useEffect(() => {
-    let isActive = true; // Flag to prevent state updates after unmount
-    
-    const createPaymentIntent = async () => {
-      if (amount <= 0 || isLoading) return;
-      
-      setIsLoading(true);
-      
-      try {
-        const response = await fetch(endpoint('/api/stripe/create-payment-intent'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            amount, 
-            plan,
-            payment_method_types: ['card', 'link'],
-            enable_link: true
-          }),
-        });
-        
-        const data = await response.json();
-        
-        if (isActive) {
-          setClientSecret(data.clientSecret);
-          // Extract payment intent ID from the client secret (format: pi_XXXX_secret_YYYY)
-          const piId = data.clientSecret.split('_secret_')[0];
-          setPaymentIntentId(piId);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('Failed to create payment intent:', err);
-        if (isActive && onPaymentError) {
-          onPaymentError('Failed to prepare payment');
-          setIsLoading(false);
-        }
-      }
-    };
-
-    // Only create a new payment intent if we don't have one for the current amount/plan
-    createPaymentIntent();
-    
-    // Cleanup function to cancel abandoned payment intents
-    return () => {
-      isActive = false;
-      
-      // Cancel abandoned payment intent when component unmounts
-      if (paymentIntentId) {
-        fetch(endpoint('/api/stripe/cancel-payment-intent'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentIntentId })
-        }).catch(err => console.error('Error canceling payment intent:', err));
-      }
-    };
-  }, [amount, plan]); // Only re-run when amount or plan changes
-
-  return (
-    <PaymentContainer>
-      {clientSecret && stripePromise && (
-        // Use a key to force remount when clientSecret changes
-        <Elements 
-          key={clientSecret}
-          stripe={stripePromise} 
-          options={{ 
-            clientSecret, 
-            appearance: { theme: 'stripe' }
-          }}
-        >
-          <CheckoutForm 
-            amount={amount} 
-            plan={plan} 
-            onPaymentSuccess={onPaymentSuccess}
-            onPaymentError={onPaymentError}
-          />
-        </Elements>
-      )}
-      {isLoading && <div style={{ textAlign: 'center', marginTop: '20px' }}>Loading payment form...</div>}
-    </PaymentContainer>
-  );
-};
-
 // Main Signup component
 const Signup: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>('free');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [showPayment, setShowPayment] = useState<boolean>(false);
-  const [planAmount, setPlanAmount] = useState<number>(0);
-  const [paymentCompleted, setPaymentCompleted] = useState<boolean>(false);
   const [formData, setFormData] = useState<{
     fullName: string;
     lastName: string;
@@ -582,23 +329,11 @@ const Signup: React.FC = () => {
     businessType: '',
     agreeToTerms: false
   });
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
 
+  // Only include the free plan
   const plans = [
-    { id: 'free', title: 'Free Plan', description: '500 Credits · 1 Agent', price: '$0', amount: 0 },
-    { id: 'silver', title: 'Silver', description: '5k Credits · 5 Agents · 2 Tools', price: '$29', amount: 2900 },
-    { id: 'gold', title: 'Gold', description: '15k Credits · 10 Agents · Voice Agent', price: '$99', amount: 9900 },
-    { id: 'diamond', title: 'Diamond', description: '50k Credits · 20 Agents · White Label', price: '$249', amount: 24900 }
+    { id: 'free', title: 'Free Plan', description: '500 Credits · 1 Agent', price: '$0', amount: 0 }
   ];
-
-  useEffect(() => {
-    // Find the selected plan and set its amount
-    const plan = plans.find(p => p.id === selectedPlan);
-    if (plan) {
-      setPlanAmount(plan.amount);
-      setShowPayment(plan.amount > 0);
-    }
-  }, [selectedPlan]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { id, value, type } = e.target;
@@ -611,22 +346,7 @@ const Signup: React.FC = () => {
   };
 
   const handlePlanSelect = (planId: string) => {
-    setSelectedPlan(planId);
-    const plan = plans.find(p => p.id === planId);
-    if (plan) {
-      setPlanAmount(plan.amount);
-      setShowPayment(plan.amount > 0);
-    }
-  };
-
-  const handlePaymentSuccess = () => {
-    setPaymentCompleted(true);
-    setIsPaymentModalOpen(false);
-    completeSignup();
-  };
-
-  const handlePaymentError = (message: string) => {
-    setError(message);
+    setSelectedPlan('free');
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -655,14 +375,7 @@ const Signup: React.FC = () => {
       return;
     }
 
-    // If paid plan is selected, show payment modal
-    if (selectedPlan !== 'free') {
-      setLoading(false);
-      setIsPaymentModalOpen(true);
-      return;
-    }
-
-    // For free plan, continue with signup process
+    // Always continue with signup process (no payment modal)
     await completeSignup();
   };
 
@@ -676,8 +389,7 @@ const Signup: React.FC = () => {
         email: formData.email,
         password: formData.password,
         businessType: formData.businessType,
-        plan: selectedPlan,
-        paymentCompleted: paymentCompleted
+        plan: 'free' // Always use free plan
       };
       
       // Make API call to backend using the endpoint helper
@@ -714,115 +426,92 @@ const Signup: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Link to="/">
-          <Logo src="/assets/img/logo.png" alt="Logo" />
-        </Link>
+        <Logo src="/assets/img/logo.png" alt="Logo" />
       </Header>
       <ContentWrapper>
         <FormSection>
           <HeaderSection>
-            <HeaderTitle>Create Your Free Account</HeaderTitle>
-            <HeaderSubtitle>Start your free trial. No credit card required.</HeaderSubtitle>
+            <HeaderTitle>Create your account</HeaderTitle>
+            <HeaderSubtitle>Get started with your free account</HeaderSubtitle>
           </HeaderSection>
-          
           <FormContent>
             <form onSubmit={handleSubmit}>
               <InputGroup>
                 <Input 
                   type="text" 
-                  placeholder="Full Name"
-                  id="fullName"
-                  value={formData.fullName}
+                  id="fullName" 
+                  placeholder="First Name" 
                   onChange={handleInputChange}
+                  value={formData.fullName}
                 />
                 <Input 
                   type="text" 
-                  placeholder="Last Name"
-                  id="lastName"
-                  value={formData.lastName}
+                  id="lastName" 
+                  placeholder="Last Name" 
                   onChange={handleInputChange}
+                  value={formData.lastName}
                 />
               </InputGroup>
-
               <Input 
                 type="email" 
-                placeholder="Email address"
-                id="email"
-                value={formData.email}
+                id="email" 
+                placeholder="Email" 
                 onChange={handleInputChange}
-                style={{ backgroundColor: '#f0f4f8' }}
+                value={formData.email}
               />
-
               <Input 
                 type="password" 
-                placeholder="Password"
-                id="password"
+                id="password" 
+                placeholder="Password" 
+                onChange={handleInputChange}
                 value={formData.password}
-                onChange={handleInputChange}
-                style={{ backgroundColor: '#f0f4f8' }}
               />
-
-              <Select
-                id="businessType"
-                value={formData.businessType}
+              <Select 
+                id="businessType" 
                 onChange={handleInputChange}
+                value={formData.businessType}
               >
-                <option value="" disabled selected>Select your business type</option>
+                <option value="">Select Business Type</option>
                 <option value="dropshipper">Dropshipper</option>
-                <option value="influencer">Influencer</option>
                 <option value="themePage">Theme Page</option>
+                <option value="influencer">Influencer</option>
                 <option value="other">Other</option>
               </Select>
-
+              
               <CheckboxContainer>
-                <Checkbox
-                  type="checkbox"
-                  id="agreeToTerms"
-                  checked={formData.agreeToTerms}
+                <Checkbox 
+                  type="checkbox" 
+                  id="agreeToTerms" 
                   onChange={handleInputChange}
+                  checked={formData.agreeToTerms}
                 />
                 <CheckboxLabel htmlFor="agreeToTerms">
-                  I agree to the <Link to="/terms-and-policy" target="_blank">Terms of Service</Link> and <Link to="/terms-and-policy" target="_blank">Privacy Policy</Link>
+                  I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
                 </CheckboxLabel>
               </CheckboxContainer>
-
+              
+              {error && <ErrorMessage>{error}</ErrorMessage>}
+              
               <Button type="submit" disabled={loading}>
                 {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
               
-              {error && <ErrorMessage>{error}</ErrorMessage>}
+              <SignInText>
+                Already have an account?<Link to="/login">Sign in</Link>
+              </SignInText>
             </form>
-
-            <SignInText>
-              Already have an account? <Link to="/login">Sign in</Link>
-            </SignInText>
           </FormContent>
         </FormSection>
-
+        
         <PlanSection>
-          <PlanTitle>Choose your plan:</PlanTitle>
+          <PlanTitle>Choose your plan</PlanTitle>
+          
           {plans.map(plan => (
             <PlanCard 
-              key={plan.id}
+              key={plan.id} 
               selected={selectedPlan === plan.id}
-              onClick={() => plan.id === 'free' && handlePlanSelect(plan.id)}
-              disabled={plan.id !== 'free'}
+              onClick={() => handlePlanSelect(plan.id)}
             >
-              {plan.id !== 'free' && (
-                <div style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  right: '-10px',
-                  background: '#ff6b6b',
-                  color: 'white',
-                  padding: '4px 8px',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  fontWeight: 500
-                }}>
-                  Coming Soon
-                </div>
-              )}
               <PlanInfo>
                 <PlanDetails>
                   <PlanTitle2>{plan.title}</PlanTitle2>
@@ -832,23 +521,25 @@ const Signup: React.FC = () => {
               </PlanInfo>
             </PlanCard>
           ))}
-
+          
+          <RecommendedBadge>All features included</RecommendedBadge>
+          
           <TrustedSection>
-            <TrustedTitle>Trusted by leading companies</TrustedTitle>
+            <TrustedTitle>Trusted by businesses worldwide</TrustedTitle>
             <SocialIcons>
               <SocialIcon>
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                  <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
                 </svg>
               </SocialIcon>
               <SocialIcon>
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.652V24l4.088-2.242c1.092.3 2.246.464 3.443.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.263-5.963 3.26L10.732 8l3.131 3.263 5.887-3.26-6.559 6.96z"/>
+                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
                 </svg>
               </SocialIcon>
               <SocialIcon>
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20.317 4.492c-1.53-.69-3.17-1.2-4.885-1.49a.075.075 0 00-.079.036c-.21.375-.444.864-.608 1.25a18.566 18.566 0 00-5.487 0 12.36 12.36 0 00-.617-1.25.077.077 0 00-.079-.036c-1.714.29-3.354.8-4.885 1.491a.07.07 0 00-.032.027C.533 9.093-.32 13.555.099 17.961a.08.08 0 00.031.055 20.03 20.03 0 005.993 2.98.078.078 0 00.084-.026c.462-.62.874-1.275 1.226-1.963.021-.04.001-.088-.041-.104a13.201 13.201 0 01-1.872-.878.075.075 0 01-.008-.125c.126-.093.252-.19.372-.287a.075.075 0 01.078-.01c3.927 1.764 8.18 1.764 12.061 0a.075.075 0 01.079.009c.12.098.245.195.372.288a.075.075 0 01-.006.125c-.598.344-1.22.635-1.873.877a.075.075 0 00-.041.105c.36.687.772 1.341 1.225 1.962a.077.077 0 00.084.028 19.963 19.963 0 006.002-2.981.076.076 0 00.032-.054c.5-5.094-.838-9.52-3.549-13.442a.06.06 0 00-.031-.028zM8.02 15.278c-1.182 0-2.157-1.069-2.157-2.38 0-1.312.956-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.956 2.38-2.157 2.38zm7.975 0c-1.183 0-2.157-1.069-2.157-2.38 0-1.312.955-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.946 2.38-2.157 2.38z"/>
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
               </SocialIcon>
               <SocialIcon>
@@ -860,23 +551,6 @@ const Signup: React.FC = () => {
           </TrustedSection>
         </PlanSection>
       </ContentWrapper>
-      
-      {/* Add payment modal */}
-      <Modal isOpen={isPaymentModalOpen}>
-        <ModalContent>
-          <ModalHeader>
-            <ModalTitle>Complete Payment</ModalTitle>
-            <CloseButton onClick={() => setIsPaymentModalOpen(false)}>×</CloseButton>
-          </ModalHeader>
-          
-          <InlineStripePayment 
-            amount={planAmount} 
-            plan={selectedPlan}
-            onPaymentSuccess={handlePaymentSuccess}
-            onPaymentError={handlePaymentError}
-          />
-        </ModalContent>
-      </Modal>
     </Container>
   );
 };
