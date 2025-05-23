@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 // Remove Stripe imports
@@ -15,6 +15,7 @@ const Container = styled.div`
   align-items: center;
   padding: 20px;
   padding-top: 70px;
+  overflow-x: hidden;
 `;
 
 const Header = styled.header`
@@ -40,19 +41,29 @@ const Logo = styled.img`
 
 const ContentWrapper = styled.div`
   display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 1000px;
   background: white;
   border-radius: 8px;
-  margin-top: 110px;
+  margin-top: 30px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   min-height: 650px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    margin-top: 200px;
+  }
 `;
 
 const FormSection = styled.div`
   flex: 1;
   padding: 0;
-  border-right: 1px solid #f0f0f0;
+  border-right: none;
+  
+  @media (min-width: 768px) {
+    border-right: 1px solid #f0f0f0;
+  }
 `;
 
 const HeaderSection = styled.div`
@@ -60,7 +71,11 @@ const HeaderSection = styled.div`
   color: white;
   padding: 24px;
   text-align: center;
-  border-radius: 8px 0 0 0;
+  border-radius: 8px 8px 0 0;
+  
+  @media (min-width: 768px) {
+    border-radius: 8px 0 0 0;
+  }
 `;
 
 const HeaderTitle = styled.h1`
@@ -75,11 +90,15 @@ const HeaderSubtitle = styled.p`
 `;
 
 const FormContent = styled.div`
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   height: calc(100% - 76px); /* Subtract header height */
   justify-content: center; /* Center content vertically */
+
+  @media (min-width: 768px) {
+    padding: 24px;
+  }
 
   form {
     display: flex;
@@ -115,9 +134,13 @@ const Divider = styled.div`
 
 const InputGroup = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-bottom: 12px;
+  
+  @media (min-width: 576px) {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 
 const Input = styled.input`
@@ -127,6 +150,7 @@ const Input = styled.input`
   border-radius: 4px;
   margin-bottom: 0; /* Remove margin since we're using gap */
   background: ${props => props.type === 'email' ? '#f0f4f8' : 'white'};
+  font-size: 16px; /* Better for mobile */
 
   &:focus {
     outline: none;
@@ -142,6 +166,7 @@ const Select = styled.select`
   margin-bottom: 0; /* Remove margin since we're using gap */
   color: #495057;
   appearance: auto;
+  font-size: 16px; /* Better for mobile */
 `;
 
 const CheckboxContainer = styled.div`
@@ -152,11 +177,14 @@ const CheckboxContainer = styled.div`
 
 const Checkbox = styled.input`
   margin-right: 8px;
-  margin-top: 2px;
+  margin-top: 3px;
+  min-width: 20px;
+  min-height: 20px;
 `;
 
 const CheckboxLabel = styled.label`
   font-size: 14px;
+  line-height: 1.4;
   
   a {
     color: #4754F0;
@@ -166,13 +194,14 @@ const CheckboxLabel = styled.label`
 
 const Button = styled.button<{ disabled?: boolean }>`
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: ${props => props.disabled ? '#a0a0a0' : '#4754F0'};
   color: white;
   border: none;
   border-radius: 4px;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   font-weight: 500;
+  font-size: 16px;
   
   &:hover {
     background: ${props => props.disabled ? '#a0a0a0' : '#3a45d1'};
@@ -181,16 +210,23 @@ const Button = styled.button<{ disabled?: boolean }>`
 
 const SignInText = styled.div`
   text-align: center;
-  padding: 24px 0;
+  padding: 16px 0;
   font-size: 14px;
   border-top: 1px solid #e0e0e0;
-  margin-top: 32px;
+  margin-top: 24px;
+  
+  @media (min-width: 768px) {
+    padding: 24px 0;
+    margin-top: 32px;
+  }
   
   a {
     color: #4754F0;
     text-decoration: none;
     font-weight: 500;
     margin-left: 8px;
+    display: inline-block;
+    padding: 4px;
     
     &:hover {
       text-decoration: underline;
@@ -199,8 +235,12 @@ const SignInText = styled.div`
 `;
 
 const PlanSection = styled.div`
-  width: 350px;
+  width: 100%;
   padding: 24px;
+  
+  @media (min-width: 768px) {
+    width: 350px;
+  }
 `;
 
 const PlanTitle = styled.h2`
@@ -260,10 +300,20 @@ const RecommendedBadge = styled.div`
   position: absolute;
   top: -10px;
   right: -10px;
+  display: none;
+  
+  @media (min-width: 768px) {
+    display: block;
+  }
 `;
 
 const TrustedSection = styled.div`
   margin-top: 24px;
+  display: none;
+  
+  @media (min-width: 768px) {
+    display: block;
+  }
 `;
 
 const TrustedTitle = styled.h3`
@@ -307,6 +357,9 @@ const ErrorMessage = styled.div`
   font-size: 13px;
   text-align: center;
   margin-top: 10px;
+  padding: 8px;
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 4px;
 `;
 
 // Main Signup component
@@ -314,6 +367,7 @@ const Signup: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>('free');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
   const [formData, setFormData] = useState<{
     fullName: string;
     lastName: string;
@@ -329,6 +383,16 @@ const Signup: React.FC = () => {
     businessType: '',
     agreeToTerms: false
   });
+
+  // Add event listener to check for mobile size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Only include the free plan
   const plans = [
@@ -412,10 +476,8 @@ const Signup: React.FC = () => {
       }
 
       const data = await response.json();
-      
       // Redirect to solutions.tixaeagents.ai
-      window.location.href = process.env.REACT_APP_DASHBOARD_URL || 'https://solutions.tixaeagents.ai';
-      
+      window.location.href = 'https://solutions.tixaeagents.ai';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during signup');
     } finally {
@@ -426,7 +488,7 @@ const Signup: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Logo src="/assets/img/logo.png" alt="Logo" />
+        <Logo src="/assets/img/logo.png" alt="Logo" onClick={() => window.location.href = '/'} />
       </Header>
       <ContentWrapper>
         <FormSection>
@@ -497,7 +559,7 @@ const Signup: React.FC = () => {
               </Button>
               
               <SignInText>
-                Already have an account?<Link to="/login">Sign in</Link>
+                Already have an account?{isMobile ? <br/> : null}<Link to="/login">Sign in</Link>
               </SignInText>
             </form>
           </FormContent>
@@ -522,33 +584,35 @@ const Signup: React.FC = () => {
             </PlanCard>
           ))}
           
-          <RecommendedBadge>All features included</RecommendedBadge>
+          {!isMobile && <RecommendedBadge>All features included</RecommendedBadge>}
           
-          <TrustedSection>
-            <TrustedTitle>Trusted by businesses worldwide</TrustedTitle>
-            <SocialIcons>
-              <SocialIcon>
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
-                </svg>
-              </SocialIcon>
-              <SocialIcon>
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                </svg>
-              </SocialIcon>
-              <SocialIcon>
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </SocialIcon>
-              <SocialIcon>
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-              </SocialIcon>
-            </SocialIcons>
-          </TrustedSection>
+          {!isMobile && (
+            <TrustedSection>
+              <TrustedTitle>Trusted by businesses worldwide</TrustedTitle>
+              <SocialIcons>
+                <SocialIcon>
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                  </svg>
+                </SocialIcon>
+                <SocialIcon>
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                  </svg>
+                </SocialIcon>
+                <SocialIcon>
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                </SocialIcon>
+                <SocialIcon>
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </SocialIcon>
+              </SocialIcons>
+            </TrustedSection>
+          )}
         </PlanSection>
       </ContentWrapper>
     </Container>

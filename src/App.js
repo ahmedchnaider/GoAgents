@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LandingPage from './components/LandingPage.js'; // Import your LandingPage component
+import Home from './components/Home.tsx'; // Import the new Home component
 import Signup from './components/Signup.tsx'; // Import your Signup component
 import TermsAndPolicy from './components/TermsAndPolicy.tsx'; // Import Terms and Policy component
 import CapabilityPage from './components/capabilities/CapabilityPage';
@@ -12,7 +12,7 @@ const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<LandingPage />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/terms-and-policy" element={<TermsAndPolicy />} />
                 

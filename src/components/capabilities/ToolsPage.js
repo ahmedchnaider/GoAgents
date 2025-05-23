@@ -30,7 +30,7 @@ const ToolsPage = () => {
         </div>
         <div className="hero-visual">
           <img 
-            src="/assets/img/tools.jpg" 
+            src="/assets/img/toolsh.avif" 
             alt="Automation Tools Integration" 
             className="dashboard-preview" />
         </div>
@@ -100,7 +100,7 @@ const ToolsPage = () => {
       <section className="full-width-image-section">
         <div className="image-container">
           <img 
-            src="/assets/img/webphone.png" 
+            src="/assets/img/tools.jpg" 
             alt="Zapier and Make Integration" 
             className="feature-image"
           />
