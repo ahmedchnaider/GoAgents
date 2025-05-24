@@ -2805,7 +2805,7 @@ const Home: React.FC = () => {
               onClick={() => setCurrentSlide(4)}
               >
                 <img 
-                  src="/assets/img/UserAgent3.png"
+                  src="/assets/img/UserAgent3.jpg"
                   alt="Theme Pages Agent"
                   style={{
                     width: '220px',
