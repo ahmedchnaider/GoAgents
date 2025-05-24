@@ -5095,7 +5095,7 @@ In App Integration                  </span>
                 marginLeft: '0',
               }}>
                 <img 
-                  src="/assets/img/UserAgent3.png"
+                  src="/assets/img/Useragent3.jpg"
                   alt="AI Agent"
                   style={{
                     position: 'absolute',
