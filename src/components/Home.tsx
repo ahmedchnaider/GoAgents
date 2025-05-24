@@ -2523,7 +2523,7 @@ const Home: React.FC = () => {
                   transition: 'opacity 0.3s ease',
                 }}>🔥 POPULAR</div>
                 <img 
-                  src="/assets/img/UserAgent4.png"
+                  src="/assets/img/Useragent4.png"
                   alt="Course Mentor Agent"
                   style={{
                     width: '220px',
@@ -2912,7 +2912,7 @@ const Home: React.FC = () => {
                   transition: 'opacity 0.3s ease',
                 }}>🔥 POPULAR</div>
                 <img 
-                  src="/assets/img/UserAgent6.png"
+                  src="/assets/img/Useragent6.png"
                   alt="Inspirational Coach Agent"
                   style={{
                     width: '220px',
@@ -5095,7 +5095,7 @@ In App Integration                  </span>
                 marginLeft: '0',
               }}>
                 <img 
-                  src="/assets/img/Useragent3.jpg"
+                  src="/assets/img/Useragent3.png"
                   alt="AI Agent"
                   style={{
                     position: 'absolute',
