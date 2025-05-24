@@ -2416,7 +2416,7 @@ const Home: React.FC = () => {
                   transition: 'opacity 0.3s ease',
                 }}>🔥 POPULAR</div>
                 <img 
-                  src="/assets/img/UserAgent5.png"
+                  src="/assets/img/Useragent5.png"
                   alt="Real Estate Agent"
                   style={{
                     width: '220px',
@@ -2617,7 +2617,7 @@ const Home: React.FC = () => {
               onClick={() => setCurrentSlide(2)}
               >
                 <img 
-                  src="/assets/img/UserAgent1.png"
+                  src="/assets/img/Useragent1.png"
                   alt="Dropshipping Agent"
                   style={{
                     width: '220px',
@@ -2711,7 +2711,7 @@ const Home: React.FC = () => {
               onClick={() => setCurrentSlide(3)}
               >
                 <img 
-                  src="/assets/img/UserAgent2.png"
+                  src="/assets/img/Useragent2.png"
                   alt="Lifestyle Influencer Agent"
                   style={{
                     width: '220px',
@@ -2805,7 +2805,7 @@ const Home: React.FC = () => {
               onClick={() => setCurrentSlide(4)}
               >
                 <img 
-                  src="/assets/img/UserAgent3.jpg"
+                  src="/assets/img/Useragent3.png"
                   alt="Theme Pages Agent"
                   style={{
                     width: '220px',
@@ -3003,7 +3003,7 @@ const Home: React.FC = () => {
               onClick={() => setCurrentSlide(6)}
               >
                 <img
-                    src="/assets/img/UserAgent4.png"
+                    src="/assets/img/Useragent4.png"
                     alt="Custom Agent"
                     style={{
                       width: '220px',
