@@ -30,7 +30,7 @@ const PhoneCallsPage = () => {
         </div>
         <div className="hero-visual">
           <img 
-            src="public/assets/img/support.png" 
+            src="public/assets/img/phone.png" 
             alt="Phone Calls Dashboard" 
             className="dashboard-preview" 
           />

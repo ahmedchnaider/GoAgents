@@ -8,8 +8,10 @@ import { omniChatData, phoneCallsData, toolsData } from './data/capabilityData';
 import Classroom from './components/Classroom.tsx'; // Import the new Classroom component
 import ClassroomModule from './components/ClassroomModule.tsx'; // Import the ClassroomModule component
 
+
 const App = () => {
     return (
+        
         <Router>
             <Routes>
                 <Route path="/" element={<Home />} />

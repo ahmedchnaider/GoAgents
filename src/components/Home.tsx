@@ -51,6 +51,20 @@ const Home: React.FC = () => {
   const [basePlanPrice, setBasePlanPrice] = useState(99); // Default to gold plan price
   const [extraCredits, setExtraCredits] = useState(0);
   
+  // --- FIX: Update total, extra credits, and extra cost when plan or credits change ---
+  useEffect(() => {
+    const extraCreditsEl = document.getElementById('extraCredits');
+    const extraCostEl = document.getElementById('extraCost');
+    const totalCostEl = document.getElementById('totalCost');
+    if (extraCreditsEl && extraCostEl && totalCostEl) {
+      const extraCost = extraCredits * 0.006;
+      const total = (basePlanPrice + extraCost).toFixed(2);
+      extraCreditsEl.textContent = `${extraCredits.toLocaleString()} extra credits`;
+      extraCostEl.textContent = `$${extraCost.toFixed(2)}`;
+      totalCostEl.textContent = `$${total}`;
+    }
+  }, [basePlanPrice, extraCredits]);
+  
   // Add keyframes for floating animation for the agent
   useEffect(() => {
     // Create a style element for the animation
@@ -738,7 +752,7 @@ const Home: React.FC = () => {
         justifyContent: 'center',
         width: '100%',
         position: 'relative',
-        paddingTop: '180px',
+        paddingTop: isMobile ? '60px' : '180px',
       }}>
         {/* Center Content */}
         <div style={{
@@ -747,26 +761,10 @@ const Home: React.FC = () => {
           alignItems: 'center',
           textAlign: 'center',
           maxWidth: '1000px',
-          padding: '0 20px',
+          padding: '80px 20px',
           zIndex: 2,
         }}>
-          {/* Product of the Day Badge */}
-          <div style={{ 
-            backgroundColor: '#f0f4f8',
-            color: '#2937f0',
-            padding: '12px 28px',
-            borderRadius: '50px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            marginBottom: '50px',
-            opacity: isLoaded ? 1 : 0,
-            transform: `translateY(${isLoaded ? '0' : '20px'})`,
-            transition: 'opacity 0.6s ease, transform 0.6s ease',
-            transitionDelay: '0.1s',
-          }}>
-            <span style={{ color: '#ffd700', marginRight: '10px', fontSize: '22px' }}>🏆</span>
-            <span style={{ fontSize: '16px', color: '#2937f0', fontWeight: 600 }}>#2 Product of the Day</span>
-          </div>
+        
 
           {/* Main Heading - exactly like reference but bigger */}
           <h1 style={{ 
@@ -779,7 +777,7 @@ const Home: React.FC = () => {
             transition: 'opacity 0.7s ease, transform 0.7s ease',
             transitionDelay: '0.2s',
           }}>
-            Easiest  Way To Create
+            The Easy Way To Build
             {isMobile ? (
               <span style={{ color: '#2937f0', display: 'block', marginTop: '10px' }}>AI AGENTS</span>
             ) : (
@@ -801,7 +799,7 @@ const Home: React.FC = () => {
             transition: 'opacity 0.7s ease, transform 0.7s ease',
             transitionDelay: '0.3s',
           }}>
-            Deploy intelligence across Instagram, Telegram, WhatsApp, Discord, and phone calls.
+            Deploy Agents For Free across All Social Madia Platfroms and Phone Calls.
             {isMobile ? (
               " All to Maximize your Profits."
             ) : (
@@ -897,22 +895,12 @@ const Home: React.FC = () => {
             </button>
           </div>
 
-          {/* Trusted by text */}
-          <p style={{ 
-            fontSize: '16px', 
-            color: '#777', 
-            marginBottom: '25px',
-            opacity: isLoaded ? 1 : 0,
-            transform: `translateY(${isLoaded ? '0' : '20px'})`,
-            transition: 'opacity 0.7s ease, transform 0.7s ease',
-            transitionDelay: '0.5s',
-          }}>
-            Trusted by leading companies worldwide
-          </p>
+          
 
           {/* Company Logos */}
           <div style={{ 
             display: 'flex',
+            visibility: isMobile ? 'hidden' : 'visible',
             justifyContent: 'center',
             alignItems: 'center',
             gap: '30px',
@@ -1478,7 +1466,7 @@ const Home: React.FC = () => {
                   gap: '20px',
                 }}>
                   {/* Voice Call Button with shaking phone emoji */}
-                  <button style={{
+                  <button onClick={() => scrollToSection(document.getElementById('experience-ai-voice') ? { current: document.getElementById('experience-ai-voice') } : null)} style={{
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
@@ -1500,27 +1488,7 @@ const Home: React.FC = () => {
                   }}>
                     <span className="shake-phone">📞</span> Voice Call
                   </button>
-                  <button style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#2937f0',
-                  }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path d="M15 10l-4 4l6 6l4-16l-16 4l6 6l4-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                  <button style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#2937f0',
-                  }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <circle cx="12" cy="12" r="3" strokeWidth="2"/>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" strokeWidth="2"/>
-                    </svg>
-                  </button>
+                 
                 </div>
               </div>
 
@@ -2434,7 +2402,15 @@ const Home: React.FC = () => {
                   Real Estate Agent 🏠
                 </h3>
 
-                {/* Button above text */}
+                <p style={{
+                  fontSize: '16px',
+                  color: '#666',
+                  lineHeight: '1.5',
+                  height: '70px',
+                }}>
+                  Qualifies leads, schedules property viewings, and answers questions about listings and neighborhoods.
+                </p>
+
                 <button style={{
                   width: currentSlide === 0 ? '180px' : '40px',
                   height: '40px',
@@ -2447,7 +2423,6 @@ const Home: React.FC = () => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   gap: '8px',
-                  marginBottom: '20px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -2463,15 +2438,6 @@ const Home: React.FC = () => {
                   </svg>
                   {currentSlide === 0 && <span style={{ color: 'white', fontWeight: 'bold' }}>Try This Agent</span>}
                 </button>
-                
-                <p style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  lineHeight: '1.5',
-                  height: '70px',
-                }}>
-                  Qualifies leads, schedules property viewings, and answers questions about listings and neighborhoods.
-                </p>
               </div>
       
               {/* Course Mentor Agent */}
@@ -2541,7 +2507,15 @@ const Home: React.FC = () => {
                   Course Mentor Agent 📅
                 </h3>
                 
-                {/* Button above text */}
+                <p style={{
+                  fontSize: '16px',
+                  color: '#666',
+                  lineHeight: '1.5',
+                  height: '70px',
+                }}>
+                  Provides AI Mentor for your Online Course and provides 24/7 multilingual customer service.
+                </p>
+                
                 <button style={{
                   width: currentSlide === 1 ? '180px' : '40px',
                   height: '40px',
@@ -2554,7 +2528,6 @@ const Home: React.FC = () => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   gap: '8px',
-                  marginBottom: '20px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -2570,15 +2543,6 @@ const Home: React.FC = () => {
                   </svg>
                   {currentSlide === 1 && <span style={{ color: 'white', fontWeight: 'bold' }}>Try This Agent</span>}
                 </button>
-                
-                <p style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  lineHeight: '1.5',
-                  height: '70px',
-                }}>
-                  Provides AI Mentor for your Online Course and provides 24/7 multilingual customer service.
-                </p>
               </div>
 
               {/* Dropshipping Agent */}
@@ -2635,7 +2599,15 @@ const Home: React.FC = () => {
                   Dropshipping Agent 🛒
                 </h3>
                 
-                {/* Button above text */}
+                <p style={{
+                  fontSize: '16px',
+                  color: '#666',
+                  lineHeight: '1.5',
+                  height: '70px',
+                }}>
+                  Automates Sales & Customer service via Instagram & Facebook DMs, with Phone Call Lead Qualification
+                </p>
+                
                 <button style={{
                   width: currentSlide === 2 ? '180px' : '40px',
                   height: '40px',
@@ -2648,7 +2620,6 @@ const Home: React.FC = () => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   gap: '8px',
-                  marginBottom: '20px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -2664,15 +2635,6 @@ const Home: React.FC = () => {
                   </svg>
                   {currentSlide === 2 && <span style={{ color: 'white', fontWeight: 'bold' }}>Try This Agent</span>}
                 </button>
-                
-                <p style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  lineHeight: '1.5',
-                  height: '70px',
-                }}>
-                  Automates Sales & Customer service via Instagram & Facebook DMs, with Phone Call Lead Qualification
-                </p>
               </div>
 
               {/* Lifestyle Influencer Agent */}
@@ -2729,7 +2691,15 @@ const Home: React.FC = () => {
                   Lifestyle Influencer Agent 🌟
                 </h3>
                 
-                {/* Button above text */}
+                <p style={{
+                  fontSize: '16px',
+                  color: '#666',
+                  lineHeight: '1.5',
+                  height: '70px',
+                }}>
+                  Manages social media presence across Instagram, Telegram & Discord. Automate engagement.
+                </p>
+                
                 <button style={{
                   width: currentSlide === 3 ? '180px' : '40px',
                   height: '40px',
@@ -2742,7 +2712,6 @@ const Home: React.FC = () => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   gap: '8px',
-                  marginBottom: '20px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -2758,15 +2727,6 @@ const Home: React.FC = () => {
                   </svg>
                   {currentSlide === 3 && <span style={{ color: 'white', fontWeight: 'bold' }}>Try This Agent</span>}
                 </button>
-                
-                <p style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  lineHeight: '1.5',
-                  height: '70px',
-                }}>
-                  Manages social media presence across Instagram, Telegram & Discord. Automate engagement.
-                </p>
               </div>
 
               {/* Theme Pages Agent */}
@@ -2823,7 +2783,15 @@ const Home: React.FC = () => {
                   Theme Pages Agent 🎨
                 </h3>
                 
-                {/* Button above text */}
+                <p style={{
+                  fontSize: '16px',
+                  color: '#666',
+                  lineHeight: '1.5',
+                  height: '70px',
+                }}>
+                  Manages phone calls, processes bookings, and provides 24/7 multilingual customer service.
+                </p>
+                
                 <button style={{
                   width: currentSlide === 4 ? '180px' : '40px',
                   height: '40px',
@@ -2836,7 +2804,6 @@ const Home: React.FC = () => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   gap: '8px',
-                  marginBottom: '20px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -2852,15 +2819,6 @@ const Home: React.FC = () => {
                   </svg>
                   {currentSlide === 4 && <span style={{ color: 'white', fontWeight: 'bold' }}>Try This Agent</span>}
                 </button>
-                
-                <p style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  lineHeight: '1.5',
-                  height: '70px',
-                }}>
-                  Manages phone calls, processes bookings, and provides 24/7 multilingual customer service.
-                </p>
               </div>
 
               {/* Custom Agent */}
@@ -3021,7 +2979,15 @@ const Home: React.FC = () => {
                   Custom Agent 🛠️
                 </h3>
                 
-                {/* Button above text */}
+                <p style={{
+                  fontSize: '16px',
+                  color: '#666',
+                  lineHeight: '1.5',
+                  height: '70px',
+                }}>
+                  Health Care Agent that provides medical information, appointment scheduling, and patient follow-up services.
+                </p>
+                
                 <button style={{
                   width: currentSlide === 6 ? '180px' : '40px',
                   height: '40px',
@@ -3034,7 +3000,6 @@ const Home: React.FC = () => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   gap: '8px',
-                  marginBottom: '20px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -3050,15 +3015,6 @@ const Home: React.FC = () => {
                   </svg>
                   {currentSlide === 6 && <span style={{ color: 'white', fontWeight: 'bold' }}>Try This Agent</span>}
                 </button>
-                
-                <p style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  lineHeight: '1.5',
-                  height: '70px',
-                }}>
-                  Build Your Own Custom Agent that represents the soul of your business model.
-                </p>
               </div>
             </div>
           </div>
@@ -4248,16 +4204,7 @@ In App Integration                  </span>
                   5 Agents
                 </div>
 
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '16px',
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                  1 Concurrent Call
-                </div>
+            
 
                 <div style={{
                   display: 'flex',
@@ -4267,9 +4214,30 @@ In App Integration                  </span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
-                  2 Tools
+                  Voice Tab
+                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  Analytics Tab
+                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  Conversation Tab
                 </div>
               </div>
+                
 
               <div style={{ marginTop: '24px' }}>
                 <button style={{
@@ -4396,7 +4364,7 @@ In App Integration                  </span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
-                  Unlock 3 Templates
+                  Leads Tab
                 </div>
 
                 <div style={{
@@ -4407,7 +4375,7 @@ In App Integration                  </span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
-                  5 Tools
+                  Metrics Tab
                 </div>
 
                 <div style={{
@@ -4418,7 +4386,18 @@ In App Integration                  </span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
-                  Voice Agent
+                  Campaigns Tab
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  Market Tab
                 </div>
               </div>
 
@@ -4521,40 +4500,7 @@ In App Integration                  </span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
-                  20 Agents
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '16px',
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                  Unlock 5 Templates
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '16px',
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                  10 Tools
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '16px',
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                  Voice Agent
+                  ∞ Agents
                 </div>
 
                 <div style={{
@@ -4566,7 +4512,43 @@ In App Integration                  </span>
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
                   White Label
+
                 </div>
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  Agency Backend
+
+                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  0.0038$/credit != 0.006$                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361ee" style={{ marginRight: '10px' }}>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                   Priority support on private discord
+
+
+                </div>
+
+                
               </div>
 
               <div style={{ marginTop: '24px' }}>
@@ -4652,8 +4634,8 @@ In App Integration                  </span>
               <input 
                 type="range" 
                 min="0" 
-                max="100000" 
-                step="1000" 
+                max="50000" 
+                step="500" 
                 defaultValue="0"
                 value={extraCredits}
                 style={{
@@ -4666,7 +4648,7 @@ In App Integration                  </span>
                 }}
                 onChange={(e) => {
                   const value = parseInt(e.target.value);
-                  const percentage = (value / 100000) * 100;
+                  const percentage = (value / 50000) * 100;
                   const extraCreditsEl = document.getElementById('extraCredits');
                   const extraCostEl = document.getElementById('extraCost');
                   const totalCostEl = document.getElementById('totalCost');
@@ -5414,14 +5396,11 @@ In App Integration                  </span>
                 overflow: 'hidden',
                 boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
               }}>
-                <video 
-                  width="100%" 
-                  controls
-                  style={{ display: 'block' }}
-                >
-                  <source src="\assets\img\Create.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+<img
+  src="/assets/img/create.jpg"
+  alt="Create"
+  style={{ width: '100%', display: 'block', borderRadius: '12px' }}
+/>
               </div>
             </div>
 
@@ -5471,14 +5450,11 @@ In App Integration                  </span>
                 overflow: 'hidden',
                 boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
               }}>
-                <video 
-                  width="100%" 
-                  controls
-                  style={{ display: 'block' }}
-                >
-                  <source src="assets/img/deploy.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+               <img
+  src="/assets/img/deploy.jpg"
+  alt="Create"
+  style={{ width: '100%', display: 'block', borderRadius: '12px' }}
+/>
               </div>
             </div>
 
@@ -5527,14 +5503,11 @@ In App Integration                  </span>
                 overflow: 'hidden',
                 boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
               }}>
-                <video 
-                  width="100%" 
-                  controls
-                  style={{ display: 'block' }}
-                >
-                  <source src="assets/img//Mointer.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+              <img
+  src="/assets/img/Mointer.jpg"
+  alt="Create"
+  style={{ width: '100%', display: 'block', borderRadius: '12px' }}
+/>
               </div>
             </div>
           </div>
@@ -5741,7 +5714,7 @@ In App Integration                  </span>
         </a>
         
         {/* Phone bubble - now placed before email */}
-        <a href="#" onClick={() => scrollToSection(document.getElementById('experience-ai-voice') ? { current: document.getElementById('experience-ai-voice') } : null)} style={{ 
+        <a  onClick={() => scrollToSection(document.getElementById('experience-ai-voice') ? { current: document.getElementById('experience-ai-voice') } : null)} style={{ 
           width: '45px', 
           height: '45px', 
           borderRadius: '50%', 
