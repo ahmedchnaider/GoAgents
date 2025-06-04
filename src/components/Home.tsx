@@ -5504,7 +5504,7 @@ In App Integration                  </span>
                 boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
               }}>
               <img
-  src="/assets/img/Mointer.jpg"
+  src="/assets/img/Mointer.JPG"
   alt="Create"
   style={{ width: '100%', display: 'block', borderRadius: '12px' }}
 />
