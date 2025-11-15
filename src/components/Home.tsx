@@ -808,6 +808,7 @@ const Home: React.FC = () => {
                 All to Maximize your Profits.
               </>
             )}
+            Impact-Site-Verification: 92462bf3-d7f1-4f4d-9c22-84ff55442459
           </p>
 
           {/* Call to Action Buttons */}
